@@ -1,2 +1,2 @@
 # curso_td
-Repositorio del curso de teoría de decisiones
+Repositorio del curso de Teoría de Decisiones

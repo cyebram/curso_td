@@ -1,0 +1,117 @@
+---
+title: "1. Datos, Modelos y Software. Ejercicios"
+date: "Febrero 2024"
+output: 
+  html_document:
+    toc: true
+    toc_depth: 1
+    theme: cerulean
+---
+
+
+<style>
+body {
+text-align: justify}
+</style>
+
+<style type="text/css">
+body{/*Normal*/
+     font-size: 20px;
+}
+</style>
+
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(knitr)
+library(tidyverse)
+library(discrtr) # A companion package for the book Introduction to Discrete Choice Analysis with `R`
+library(mlogit) # Multinomial Logit Models
+library(readr) # Read Rectangular Text Data
+```
+
+
+
+Invoke data set Mode from package mlogit. To do this you need to first load the package. This is a data set with choices about mode of transportation. This is done as follows:
+
+```{r}
+data("Mode")
+```
+
+Once you have loaded the data set, answer the following questions:
+Describe this data set. How many variables are there and of which type (i.e., categorical/quantitative)?
+
+```{r}
+glimpse(Mode)
+```
+
+
+
+
+How many different modes of transportation are in this data set? What is the most popular mode? What is the least popular mode?
+
+```{r}
+table(Mode$choice)
+```
+
+```{r}
+ggplot(Mode)+
+  geom_bar(aes(choice), color="black", fill="#566AAA")+
+  theme_bw()
+```
+
+
+
+In general, what is the most expensive mode? The least expensive?
+
+```{r}
+summary(Mode)
+```
+```{r}
+ggplot(Mode)+
+  geom_density(aes(cost.car), color="black", fill="gold3", alpha=0.6)+
+  geom_density(aes(cost.carpool), color="black", fill="red3" , alpha=0.6)+
+  geom_density(aes(cost.bus), color="black", fill="blue", alpha=0.6)+
+  geom_density(aes(cost.rail), color="black", fill="cyan", alpha=0.6)+
+  theme_bw()
+```
+
+
+
+
+Create a plot showing the univariate distributions of time by car and time by bus. Discuss.
+
+
+
+
+```{r}
+ggplot(Mode)+
+  geom_density(aes(time.car), color="black", fill="gold3", alpha=0.4)+
+  geom_density(aes(time.carpool), color="black", fill="red3" , alpha=0.4)+
+  geom_density(aes(time.bus), color="black", fill="blue", alpha=0.4)+
+  geom_density(aes(time.rail), color="black", fill="cyan", alpha=0.4)+
+  theme_bw()
+```
+
+
+
+How do choices relate to cost by the different modes?
+
+```{r}
+var_num <- names(Mode)[-1]
+
+for (k in var_num) {
+ graf <- ggplot(Mode)+
+  geom_boxplot(aes(choice,  eval(as.name(k)), fill=choice), show.legend = FALSE)+
+  ylab(k)+ 
+  theme_bw() 
+ 
+ print(graf)
+}
+
+
+```
+
+
+

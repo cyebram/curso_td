@@ -33,8 +33,32 @@ library(ggridges)
 library(ggalluvial)
 ```
 
+```{r}
+data("mc_commute_wide", package="discrtr")
+
+```
 
 
+
+```{r}
+mc_commute_wide |>  ggplot(aes(x = choice, y = sidewalk_density)) + 
+  geom_boxplot() +
+  labs(x="Mode", y = expression("Sidewalk density (km/km"^2*")"))
+```
+
+```{r}
+mc_commute_wide %>% ggplot(aes(x = sidewalk_density, y = choice, fill = choice)) +
+  geom_density_ridges(jittered_points = TRUE, bandwidth = 3.5, 
+                      position = position_points_jitter(width = 0.05, height = 0),
+                      point_shape = '|', point_size = 3, point_alpha = 1, alpha = 0.7) +
+  labs(y="Mode", x = expression("Sidewalk density (km/km"^2*")"), fill = "Mode")
+```
+
+```{r}
+mc_commute_wide |> ggplot()+
+  geom_density(aes(sidewalk_density, fill=choice), color="black", alpha=0.4)+
+  theme_bw()
+```
 
 
 

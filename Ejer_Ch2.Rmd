@@ -1,0 +1,87 @@
+---
+title: "2. EDA. Ejercicios"
+date: "Febrero 2024"
+output: 
+  html_document:
+    toc: true
+    toc_depth: 1
+    theme: cerulean
+---
+
+
+<style>
+body {
+text-align: justify}
+</style>
+
+<style type="text/css">
+body{/*Normal*/
+     font-size: 20px;
+}
+</style>
+
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(knitr)
+library(tidyverse)
+library(discrtr) # A companion package for the book Introduction to Discrete Choice Analysis with `R`
+library(mlogit) # Multinomial Logit Models
+library(readr) # Read Rectangular Text Data
+
+
+library(gplots) # Various R Programming Tools for Plotting Data
+library(ggmosaic) # Mosaic Plots in the 'ggplot2' Framework
+library(treemapify)
+library(ggridges)
+library(ggalluvial)
+
+
+```
+
+
+
+```{r}
+data("Car")
+glimpse(Car)
+
+
+Car$college <- factor(Car$college, levels = c("0", "1"), labels = c("No", "Yes"))
+
+summary(Car)
+```
+```{r}
+car_alluvia <- Car |> 
+  select(college, type1, type2, choice) |> 
+  group_by(college, type1, type2, choice) |> 
+  summarize(frequency = n(), .groups = "drop")
+```
+
+
+
+
+```{r}
+car_alluvia |> 
+  ggplot(aes(y = frequency, axis1 = college, axis2 = type1, axis3 = type2, axis4=choice)) +
+  geom_alluvium(aes(fill = college), width = 1/12, color = "black") +
+  geom_stratum(width = 1/4, fill = "black", color = "grey") +
+  geom_text(stat = "stratum", aes(label = after_stat(stratum)), color = "white", size = 3) +
+  scale_x_discrete(limits = c("College", "Type 1","Type 2", "Choice"), expand = c(.05, .05)) +
+  scale_fill_brewer(type = "qual", palette = "Dark2") + 
+  theme_minimal()
+```
+
+```{r}
+
+car_alluvia |> 
+  ggplot(aes(y = frequency, axis1 = college, axis2 = type1, axis3=choice)) +
+  geom_alluvium(aes(fill = college), width = 1/12, color = "black") +
+  geom_stratum(width = 1/3, fill = "black", color = "grey") +
+  geom_text(stat = "stratum", aes(label = after_stat(stratum)), color = "white", size = 3) +
+  scale_x_discrete(limits = c("College", "Type 1", "Choice"), expand = c(.05, .05)) +
+  scale_fill_brewer(type = "qual", palette = "Dark2") + 
+  theme_minimal()
+```
+
+

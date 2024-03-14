@@ -33,3 +33,80 @@ library(pracma)
 
 
 Un inversionista tiene $\$1000$ para invertir en dos tipo de acciones. Si invierte $\$m$ en la acción $A$ invertirá $\$(100-m)$ en la acción $B$.  Una inversión en la acción $A$ tiene una probabilidad de 0.7 de duplicar su valor y 0.3 de perder la inversión.  Una inversión en la acción $B$ tiene una probabilidad de 0.6 de duplicar su valor y 0.4 de perder la inversión.  Las probabilidades asociadas con la acción $A$ son independientes de las asociadas a la inversión $B$. Determinar el valor óptimo de $m$ si la función de utilidad del decisor para ganar o perder $x$ es $u(x)=log(x+3000)$.  
+
+
+Función utilidad
+
+```{r}
+u <- function(x){log(x+3000)}
+
+ggplot()+
+  geom_function(fun=u, linewidth=1.2, color="dodgerblue3", xlim=c(-2999, 1000))+
+  theme_bw()
+```
+
+
+Vector de valores monetarios X
+
+```{r}
+m <- 760/0.92
+X <- c(1000, 2*m-1000, 1000-2*m, -1000)
+X
+```
+
+
+Vector de probabilidades
+
+```{r}
+P <- c(0.42, 0.28, 0.18, 0.12)
+```
+
+Valor monetario esperado
+
+```{r}
+E_x <- sum(X*P)
+E_x
+
+```
+
+Utilidad esperada
+
+```{r}
+u(X)
+E_u <- sum(u(X)*P)
+E_u
+```
+Certidumbre equivalente
+
+```{r}
+xc_f <- function(x){u(x)-E_u}
+
+
+xc <- newtonRaphson(xc_f, 500)$root
+xc
+```
+
+
+Prima de riesgo
+
+```{r}
+prima <- E_x-xc
+prima
+```
+
+
+Gráfica de aversión al riesgo local
+
+```{r}
+r <- function(x){-fderiv(u,x,n=2, method="central")/fderiv(u,x,n=1,  method="central")}
+
+
+
+ggplot()+
+  geom_function(fun=r, xlim=c(-2999, 1000), color="#555AAA")+
+  geom_function(fun=function(x)1/(x+3000), xlim=c(-2999, 1000), color="red")+
+  theme_bw()
+```
+
+
+

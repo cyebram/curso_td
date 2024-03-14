@@ -1,0 +1,35 @@
+---
+title: "Ejercicio 7, capítulo 5, French"
+date: "Marzo 2024"
+output: 
+  html_document:
+    toc: true
+    toc_depth: 1
+    theme: cerulean
+---
+
+
+<style>
+body {
+text-align: justify}
+</style>
+
+<style type="text/css">
+body{/*Normal*/
+     font-size: 20px;
+}
+</style>
+
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(knitr)
+library(tidyverse)
+library(pracma) 
+```
+
+
+
+
+Un inversionista tiene $\$1000$ para invertir en dos tipo de acciones. Si invierte $\$m$ en la acción $A$ invertirá $\$(100-m)$ en la acción $B$.  Una inversión en la acción $A$ tiene una probabilidad de 0.7 de duplicar su valor y 0.3 de perder la inversión.  Una inversión en la acción $B$ tiene una probabilidad de 0.6 de duplicar su valor y 0.4 de perder la inversión.  Las probabilidades asociadas con la acción $A$ son independientes de las asociadas a la inversión $B$. Determinar el valor óptimo de $m$ si la función de utilidad del decisor para ganar o perder $x$ es $u(x)=log(x+3000)$.  

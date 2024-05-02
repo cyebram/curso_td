@@ -1,0 +1,111 @@
+---
+title: "Estimación del Modelo Logit Anidado"
+date: "Mayo 2024"
+output: 
+  html_document:
+    toc: true
+    toc_depth: 1
+    theme: cerulean
+---
+
+
+<style>
+body {
+text-align: justify}
+</style>
+
+<style type="text/css">
+body{/*Normal*/
+     font-size: 20px;
+}
+</style>
+
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(discrtr) # A companion package for the book Introduction to Discrete Choice Analysis with `R`
+library(gplots) # Various R Programming Tools for Plotting Data
+library(ggmosaic) # Mosaic Plots in the 'ggplot2' Framework
+library(treemapify)
+library(ggridges)
+library(ggalluvial)
+library(mlogit)
+library(evd)
+```
+
+
+Cargamos el conjunto de datos, el conjunto de datos `Heating` está en formato por amplitud (cada fila representa a un decisor), se transforma a formato por longitud (donde se crea una fila para cada alternativa que tenga una decisora).
+
+
+```{r}
+data("Heating", package = "mlogit")
+H <- mlogit.data(Heating, shape = "wide", choice = "depvar", varying = c(3:12))
+
+```
+
+Paa una comparación posterior se estima el modelo logit multinomial considerando como atributos de las alternativas el costo de instalación y de operación.
+
+
+```{r}
+model3 <- mlogit(depvar ~ ic + oc, Heating, shape = "wide", choice = "depvar", reflevel = "ec", varying = c(3:12))
+summary(model3)
+```
+
+
+El modelo logit anidado se estimará usando argumentos adicionales en la función `mlogit()` para definir los nidos.
+
+Definimos una fórmula con costos de instalación (ic) y costos de operación (oc) como variables específicas de cada alternativa con coeficiente genérico. 
+
+Los nidos están definidos por medio de una lista. En este modelo definimos dos nidos, uno correspondiente a los sistemas del tipo room (er y gr) y el otro a los sistemas del tipo central (ec, gc y hp). Se denominará a este modelo como `nl1` (nested logit 1).
+
+```{r}
+nl1 <- mlogit(depvar ~ oc + ic, H, nests = list(room=c('er', 'gr'), central = c('ec', 'gc', 'hp')), steptol=1e-12)
+
+summary(nl1)
+```
+
+Los coeficientes de los valores inclusivos para cada nido $\lambda_{room}$ (iv:room) y $\lambda_{central}$ (iv:central) son significativos. Estos coeficientes son interpretados como correlaciones para los nidos de la siguiente manera:
+
+$1-\lambda_{room}$
+
+```{r}
+1-nl1$coefficients["iv:room"]
+```
+
+
+
+$1-\lambda_{central}$
+
+```{r}
+1-nl1$coefficients["iv:central"]
+```
+
+
+
+Se compara el modelo anidado (nl1) con el logit multinomial (model3) por medio del ratio test de verosimilitud:
+
+```{r}
+lrtest(model3, nl1)
+```
+
+Dado que en el modelo nl1 se observa cierta similitud entre los parámatros de los nidos, es posible añadir un argumento a la función `mlogit()` para forzar que sean idénticos:
+
+```{r}
+nl2 <- mlogit(depvar ~ ic + oc, H, nests = list(room = c( 'er', 'gr'), central = c('ec', 'gc', 'hp')),
+              un.nest.el = TRUE, steptol = 1e-12)
+
+summary(nl2)
+```
+
+Y comparamos los dos modelos anidados:
+
+
+
+```{r}
+lrtest(nl1, nl2)
+```
+
+
+

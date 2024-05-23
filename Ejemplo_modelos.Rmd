@@ -1,0 +1,150 @@
+---
+title: "Ejemplo aplicando diferentes modelos"
+date: "Mayo 2024"
+output: 
+  html_document:
+    toc: true
+    toc_depth: 1
+    theme: cerulean
+---
+
+
+<style>
+body {
+text-align: justify}
+</style>
+
+
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(discrtr) # A companion package for the book Introduction to Discrete Choice Analysis with `R`
+library(gplots) # Various R Programming Tools for Plotting Data
+library(ggmosaic) # Mosaic Plots in the 'ggplot2' Framework
+library(treemapify)
+library(ggridges)
+library(ggalluvial)
+library(kableExtra)
+library(plotly)
+library(mlogit)
+library(gridExtra)
+library(evd)
+library(AER)
+library(gmnl)
+```
+
+
+Tareas Teoría de Decisiones:
+
+
+1. Ejercicios  3, 4 y 5 del Capítulo 2.
+
+2. Ejercicios Capítulo 5.
+
+3. Ejemplos realizados el 23 de mayo.
+
+Subir los archivos a su cuenta de GitHub a más tardar el sábado 25 de mayo.
+
+
+# Conjunto de datos ModeCanada
+
+Trabajaremos con los datos *ModeCanada* del package *mlogit* el cual consiste de las opciones de transporte entre Montreal y Toronto.   Está en formato por longitud con las siguientes variables: 
+
+
+* case: the individual index,
+
+* alt: the alternative, one of train, car, bus and air,
+
+* choice: one if the mode is chosen, zero otherwise,
+
+* cost: monetary cost,
+
+* ivt: in vehicule time,
+
+* ovt: out vehicule time,
+
+* frequency: frequency,
+
+* income: income,
+
+* urban: urban,
+
+* noalt: the number of alternatives available.
+
+```{r}
+data("ModeCanada", package = "mlogit")
+glimpse(ModeCanada)
+```
+
+Cambiamos el tipo de algunas variables:
+
+```{r}
+ModeCanada$dist <- as.numeric(ModeCanada$dist)
+ModeCanada$income <- as.numeric(ModeCanada$income)
+```
+
+
+
+Observamos que no todas las personas tienen todas las alternativas disponibles,  se filtra un subconjunto con disponibilidad completa:
+
+
+```{r}
+MC <- mlogit.data(ModeCanada |> 
+filter(noalt == 4),
+choice = "choice",
+shape = "long",
+alt.levels = c("air",
+"train",
+"bus",
+"car"))
+```
+
+
+
+
+
+
+
+# Conjunto de datos TravelMode
+
+Consideremos los datos *TravelMode* del package *AER* el cual consiste de las opciones de transporte entre Sidney y Melbourne.   Está en formato por longitud con las siguientes variables: 
+
+* individual: Factor indicating individual with levels 1 to 210.
+
+* mode: Factor indicating travel mode with levels "car", "air", "train", or "bus".
+
+* choice: Factor indicating choice with levels "no" and "yes".
+
+* wait: Terminal waiting time, 0 for car.
+
+* vcost: Vehicle cost component.
+
+* travel: Travel time in the vehicle.
+
+* gcost: Generalized cost measure.
+
+* income: Household income.
+
+* size: Party size.
+
+```{r}
+data("TravelMode", package = "AER")
+glimpse(TravelMode)
+```
+
+
+Cambiamos la clase del conjunto de datos:
+
+```{r}
+TM <- mlogit.data(TravelMode,
+choice = "choice",
+shape = "long",
+alt.levels = c("air",
+"train",
+"bus",
+"car"))
+```
+
+

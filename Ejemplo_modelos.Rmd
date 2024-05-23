@@ -91,6 +91,8 @@ Observamos que no todas las personas tienen todas las alternativas disponibles, 
 
 
 ```{r}
+ModeCanadafilter <- ModeCanada |> filter(noalt == 4)
+
 MC <- mlogit.data(ModeCanada |> 
 filter(noalt == 4),
 choice = "choice",
@@ -101,6 +103,72 @@ alt.levels = c("air",
 "car"))
 ```
 
+
+## Gráficas
+
+```{r}
+ggplot(ModeCanadafilter |> filter(choice==1))+
+  geom_bar(aes(alt, fill=alt), color="black", show.legend = FALSE)+
+  theme_bw()
+```
+
+```{r}
+ggplot(ModeCanadafilter)+
+  geom_boxplot(aes(alt, cost, color=alt), show.legend = FALSE)+
+  theme_bw()
+```
+
+
+```{r}
+ggplot(ModeCanadafilter)+
+  geom_boxplot(aes(alt, ivt, color=alt), show.legend = FALSE)+
+  theme_bw()
+```
+
+```{r}
+ggplot(ModeCanadafilter)+
+  geom_boxplot(aes(alt, ovt, color=alt), show.legend = FALSE)+
+  theme_bw()
+```
+
+
+
+## Modelo logit considerando el costo
+
+
+```{r}
+ml1 <- mlogit(choice ~ cost, MC)
+summary(ml1)
+```
+
+## Modelo logit considerando el costo, ivt y ovt
+
+
+```{r}
+ml2 <- mlogit(choice ~ cost+ivt+ovt, MC)
+summary(ml2)
+```
+
+## Modelo logit multinomial, considerando dist como atributo del decisor
+
+```{r}
+ml3 <- mlogit(choice~ cost+ivt+ovt|dist, MC)
+summary(ml3)
+```
+## Modelo logit multinomial, considerando dist como atributo del decisor y coeficientes específicos para costo
+
+```{r}
+ml4 <- mlogit(choice~ ivt+ovt|0|cost, MC)
+summary(ml4)
+```
+
+## Modelo anidado: Set1 (rápido) y set2(lento).
+
+```{r}
+nl1 <- mlogit(choice ~ cost+ivt+ovt, MC, nests = list(set1=c('air', 'car'), set2 = c('train', 'bus')), steptol=1e-12)
+
+summary(nl1)
+```
 
 
 
@@ -135,6 +203,8 @@ glimpse(TravelMode)
 ```
 
 
+
+
 Cambiamos la clase del conjunto de datos:
 
 ```{r}
@@ -146,5 +216,60 @@ alt.levels = c("air",
 "bus",
 "car"))
 ```
+
+# Gráficas
+
+```{r}
+ggplot(TravelMode |> filter(choice=="yes"))+
+  geom_bar(aes(mode, fill=mode), show.legend = FALSE)+
+  theme_classic()
+```
+
+```{r}
+ggplot(TravelMode |> filter(choice=="yes"))+
+  geom_boxplot(aes(mode, wait, fill=mode), show.legend = FALSE, color="black")+
+  theme_classic()
+```
+
+
+
+
+```{r}
+ggplot(TravelMode |> filter(choice=="yes"))+
+  geom_boxplot(aes(mode, travel, fill=mode), show.legend = FALSE, color="black")+
+  theme_classic()
+```
+
+## Agregar los modelos logit (al menos 3)
+
+
+## Modelo anidado: Set1 (lento) y set2(rápido).
+
+```{r}
+nl2 <- mlogit(choice ~ vcost+wait, TM, nests = list(set1=c('bus', 'train'), set2 = c( 'air', 'car')), steptol=1e-12)
+
+summary(nl2)
+```
+¿Qué significa que iv sea negativo?
+
+## Modelo de clases latentes (Q=2), considerando costo
+
+```{r}
+lc1 <- gmnl(choice ~ vcost| 0 | 0 | 0 | 1, data = TM, model = 'lc', Q = 2, panel = FALSE,  method = "bhhh")
+summary(lc1)
+```
+
+## Modelo de clases latentes (Q=2), considerando costo + wait + travel
+
+
+```{r}
+lc1 <- gmnl(choice ~ vcost+ wait| 0 | 0 | 0 | 1, data = TM, model = 'lc', Q = 2, panel = FALSE,  method = "bhhh")
+summary(lc1)
+```
+
+
+
+
+## Agregar Logit Mixto (notas capítulo 10)
 
 
